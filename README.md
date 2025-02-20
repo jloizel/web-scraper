@@ -1,2 +1,2 @@
 # web-scraper
-python scrip to scrape a specific web page
+python script to scrape historic england search page using element class names
