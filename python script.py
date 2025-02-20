@@ -4,8 +4,6 @@ import pandas as pd
 from datetime import datetime
 from bs4 import MarkupResemblesLocatorWarning
 import warnings
-import openpyxl
-import xlsxwriter
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
@@ -28,7 +26,7 @@ def scrape_page(url):
 
     data = []
     for result in results:
-        link = result.find("a")["href"] if result.find("a") else "No link"
+        link = result.find("a")["href"]
 
         # --- IMAGE SCRAPING ---
         img_container = result.find("div", class_="archive-search-results-list__image-container")
@@ -52,16 +50,16 @@ def scrape_page(url):
         details_dict = {}  
 
         if details_container:
-            # Extract Title
+            # Extract title
             title_container = details_container.find("div", class_="archive-search-result__title-container")
             if title_container:
-                title = title_container.find("a").get_text(strip=True) if title_container.find("a") else "No title"
+                title = title_container.find("a").get_text(strip=True)
 
-            # Extract All <dl> elements
+            # Extract all <dl> elements
             dl_elements = details_container.find_all("dl", class_="archive-record__dl")
             for dl in dl_elements:
-                dt = dl.find("dt")  # Find the <dt> element (key)
-                dd = dl.find("dd")  # Find the <dd> element (value)
+                dt = dl.find("dt")  # key
+                dd = dl.find("dd")  # value
 
                 if dt and dd:
                     dt_text = dt.get_text(strip=True)  
@@ -74,15 +72,14 @@ def scrape_page(url):
         row_data = {
             "Title": title,
             "Link": f"https://historicengland.org.uk{link}",
-            "Image": image_url,
-            # "Image": f'=IMAGE("{image_url}")' if image_url != "No image" else "No image"
+            "Image": image_url
         }
         # Merge dt: dd pairs dynamically into row_data
         row_data.update(details_dict)
 
         data.append(row_data)
 
-    return data if data else None  
+    return data 
 
 # Function to get the image src URL
 def scrape_urlPage(url):
@@ -99,7 +96,7 @@ def scrape_urlPage(url):
 # Ask user how many pages to scrape
 try:
     num_pages = input("Enter number of pages to scrape (leave blank for all): ").strip()
-    num_pages = int(num_pages) if num_pages else None
+    num_pages = int(num_pages)
 except ValueError:
     print("Invalid input. Scraping all pages.")
     num_pages = None
